@@ -1,19 +1,15 @@
-"""
-Requirements for TrueLine News Backend
-"""
-
 # Web Framework
 Flask==2.3.2
 Flask-CORS==4.0.0
-flask-mongoengine==1.0.0
 
-# Database
+# Database (using mongoengine directly, flask-mongoengine has compatibility issues)
 mongoengine==0.27.0
 pymongo==4.4.0
 
-# NLP and Text Processing
+# NLP and Text Processing (compatible versions)
 nltk==3.8.1
-scikit-learn==1.3.0
+numpy==1.24.3
+scikit-learn==1.3.2
 beautifulsoup4==4.12.2
 requests==2.31.0
 

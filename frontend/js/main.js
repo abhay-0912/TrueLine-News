@@ -1,7 +1,8 @@
 // TrueLine News - Frontend JavaScript
 // Main application logic
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// Use relative path to work correctly behind nginx proxy
+const API_BASE_URL = '/api';
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {

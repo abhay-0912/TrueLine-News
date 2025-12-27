@@ -5,7 +5,7 @@ Main entry point for the news verification API
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_mongoengine import MongoEngine
+import mongoengine as me
 import os
 from dotenv import load_dotenv
 import logging
@@ -20,16 +20,28 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Configure MongoDB connection
-app.config['MONGODB_SETTINGS'] = {
-    'db': os.getenv('MONGODB_DB', 'trueline_news'),
-    'host': os.getenv('MONGODB_HOST', 'localhost'),
-    'port': int(os.getenv('MONGODB_PORT', 27017)),
-    'username': os.getenv('MONGODB_USER'),
-    'password': os.getenv('MONGODB_PASSWORD'),
-}
+mongodb_host = os.getenv('MONGODB_HOST', 'localhost')
+mongodb_port = int(os.getenv('MONGODB_PORT', 27017))
+mongodb_db = os.getenv('MONGODB_DB', 'trueline_news')
+mongodb_user = os.getenv('MONGODB_USER')
+mongodb_password = os.getenv('MONGODB_PASSWORD')
 
-# Initialize database
-db = MongoEngine(app)
+# Build MongoDB URI
+if mongodb_user and mongodb_password:
+    mongodb_uri = f"mongodb://{mongodb_user}:{mongodb_password}@{mongodb_host}:{mongodb_port}/{mongodb_db}"
+else:
+    mongodb_uri = f"mongodb://{mongodb_host}:{mongodb_port}/{mongodb_db}"
+
+# Connect to MongoDB
+try:
+    me.connect(mongodb_db, host=mongodb_uri)
+except Exception as e:
+    print(f"Warning: Could not connect to MongoDB at startup: {e}")
+    print("Attempting to connect with default settings...")
+    try:
+        me.connect(mongodb_db, host=f"mongodb://{mongodb_host}:{mongodb_port}/{mongodb_db}")
+    except Exception as e2:
+        print(f"MongoDB connection failed: {e2}")
 
 # Configure logging
 logging.basicConfig(

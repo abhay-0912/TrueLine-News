@@ -2,8 +2,7 @@
 Database Models for TrueLine News
 """
 
-from flask_mongoengine import Document
-from mongoengine import StringField, DateTimeField, IntField, FloatField, BooleanField, ListField, DictField
+from mongoengine import Document, StringField, DateTimeField, IntField, FloatField, BooleanField, ListField, DictField
 from datetime import datetime
 
 class Article(Document):
