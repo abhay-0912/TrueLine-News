@@ -1,0 +1,7 @@
+"""
+Services module initialization
+"""
+
+from app.services.verification_service import VerificationService
+
+__all__ = ['VerificationService']

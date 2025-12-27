@@ -1,0 +1,151 @@
+-- TrueLine News Database Schema
+-- MongoDB Collections Definition
+
+-- Articles Collection
+db.createCollection("articles", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["title", "url", "content", "source"],
+            properties: {
+                _id: { bsonType: "objectId" },
+                title: { 
+                    bsonType: "string",
+                    maxLength: 500
+                },
+                url: { 
+                    bsonType: "string",
+                    pattern: "^https?://"
+                },
+                content: { bsonType: "string" },
+                excerpt: { 
+                    bsonType: "string",
+                    maxLength: 500
+                },
+                source: { bsonType: "string" },
+                author: { bsonType: "string" },
+                
+                credibility_score: { 
+                    bsonType: "double",
+                    minimum: 0,
+                    maximum: 1
+                },
+                verified_sources: { bsonType: "int" },
+                is_original: { bsonType: "bool" },
+                is_verified: { bsonType: "bool" },
+                cross_checked: { bsonType: "bool" },
+                
+                keywords: { 
+                    bsonType: "array",
+                    items: { bsonType: "string" }
+                },
+                sentiment_score: { 
+                    bsonType: "double",
+                    minimum: -1,
+                    maximum: 1
+                },
+                reporting_sources: { 
+                    bsonType: "array",
+                    items: { bsonType: "string" }
+                },
+                
+                published_date: { bsonType: "date" },
+                verified_date: { bsonType: "date" },
+                last_updated: { bsonType: "date" },
+                
+                status: { 
+                    bsonType: "string",
+                    enum: ["verified", "pending", "unverified"]
+                }
+            }
+        }
+    }
+});
+
+-- Create indexes for articles
+db.articles.createIndex({ "url": 1 }, { unique: true });
+db.articles.createIndex({ "source": 1 });
+db.articles.createIndex({ "verified_date": -1 });
+db.articles.createIndex({ "credibility_score": -1 });
+db.articles.createIndex({ "keywords": 1 });
+db.articles.createIndex({ "status": 1 });
+
+-- VerificationLog Collection
+db.createCollection("verification_logs", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["query", "timestamp"],
+            properties: {
+                _id: { bsonType: "objectId" },
+                query: { bsonType: "string" },
+                credibility_score: { bsonType: "double" },
+                verified_sources: { bsonType: "int" },
+                is_verified: { bsonType: "bool" },
+                is_original: { bsonType: "bool" },
+                
+                matching_articles: { 
+                    bsonType: "array",
+                    items: { bsonType: "string" }
+                },
+                found_sources: { 
+                    bsonType: "array",
+                    items: { bsonType: "string" }
+                },
+                
+                timestamp: { bsonType: "date" }
+            }
+        }
+    }
+});
+
+db.verification_logs.createIndex({ "timestamp": -1 });
+db.verification_logs.createIndex({ "query": 1 });
+
+-- TrustedSource Collection
+db.createCollection("trusted_sources", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["name", "url", "domain"],
+            properties: {
+                _id: { bsonType: "objectId" },
+                name: { bsonType: "string" },
+                url: { bsonType: "string" },
+                description: { bsonType: "string" },
+                domain: { bsonType: "string" },
+                
+                trustworthiness_score: { 
+                    bsonType: "double",
+                    minimum: 0,
+                    maximum: 1
+                },
+                article_count: { bsonType: "int" },
+                verification_rate: { 
+                    bsonType: "double",
+                    minimum: 0,
+                    maximum: 1
+                },
+                
+                category: { 
+                    bsonType: "string",
+                    enum: ["news", "investigative", "specialized", "international"]
+                },
+                country: { bsonType: "string" },
+                language: { 
+                    bsonType: "string",
+                    default: "en"
+                },
+                
+                is_active: { bsonType: "bool" },
+                added_date: { bsonType: "date" },
+                last_verified: { bsonType: "date" }
+            }
+        }
+    }
+});
+
+db.trusted_sources.createIndex({ "domain": 1 }, { unique: true });
+db.trusted_sources.createIndex({ "name": 1 }, { unique: true });
+db.trusted_sources.createIndex({ "trustworthiness_score": -1 });
+db.trusted_sources.createIndex({ "is_active": 1 });
